@@ -2,7 +2,7 @@ Summary:	ftplib - set of routines that implement the FTP protocol
 Summary(pl.UTF-8):	ftplib - zbiór funkcji implementujących protokół FTP
 Name:		ftplib
 Version:	3.1.1
-Release:	1
+Release:	2
 License:	LGPL v2+
 Group:		Libraries
 Source0:	http://nbpfaus.net/~pfau/ftplib/%{name}-3.1-1.tar.gz
