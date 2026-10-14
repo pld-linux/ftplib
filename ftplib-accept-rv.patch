@@ -1,0 +1,12 @@
+# FtpAcceptConnection returned uninitialized rv when select() woke up for neither socket
+--- a/src/ftplib.c
++++ b/src/ftplib.c
+@@ -845,7 +845,7 @@
+     int i;
+     struct timeval tv;
+     fd_set mask;
+-    int rv;
++    int rv = 0;
+ 
+     FD_ZERO(&mask);
+     FD_SET(nControl->handle, &mask);

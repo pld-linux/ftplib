@@ -1,13 +1,19 @@
 Summary:	ftplib - set of routines that implement the FTP protocol
 Summary(pl.UTF-8):	ftplib - zbiór funkcji implementujących protokół FTP
 Name:		ftplib
-Version:	3.1.1
-Release:	2
-License:	LGPL v2+
+Version:	4.0.1
+Release:	1
+License:	Artistic 2.0
 Group:		Libraries
-Source0:	http://nbpfaus.net/~pfau/ftplib/%{name}-3.1-1.tar.gz
-# Source0-md5:	763be9c7e7b110776f88521a558dbc55
-URL:		http://nbpfaus.net/~pfau/ftplib/
+Source0:	https://nbpfaus.net/~pfau/ftplib/%{name}-4.0-1.tar.gz
+# Source0-md5:	2bb35d21e1647c54032f63f59dfc24e7
+Patch0:		%{name}-ldflags.patch
+# https://salsa.debian.org/debian/ftplib/-/raw/master/debian/patches/fix-ascii-read-without-eol
+Patch1:		%{name}-ascii-readline.patch
+Patch2:		%{name}-CVE-2007-1485.patch
+Patch3:		%{name}-uint64.patch
+Patch4:		%{name}-accept-rv.patch
+URL:		https://nbpfaus.net/~pfau/ftplib/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -16,7 +22,7 @@ allow applications to create and access remote files through function
 calls instead of needing to fork and exec an interactive ftp client
 program.
 
-ftplib has been built and tested on Linux, VMS, OSF/1 and Windows NT.
+ftplib has been built and tested on Linux, Mac OS X and OpenVMS.
 
 %description -l pl.UTF-8
 ftplib to zbiór funkcji implementujących protokół FTP. Pozwalają one
@@ -24,7 +30,7 @@ aplikacjom tworzyć i pobierać zdalne pliki poprzez wywołania funkcji
 zamiast wykonywania fork i uruchamiania interaktywnego klienta ftp.
 
 Biblioteka ftplib została zbudowana i przetestowana na Linuksie,
-VMS-ie, OSF/1 oraz Windows NT.
+Mac OS X oraz OpenVMS.
 
 %package devel
 Summary:	Header files for ftplib library
@@ -51,20 +57,26 @@ Static ftplib library.
 Statyczna biblioteka ftplib.
 
 %prep
-%setup -q -n %{name}-3.1-1
+%setup -q -n %{name}-4.0-1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
 
 %build
-%{__make} -C src \
+%{__make} -C src qftp libftp.so libftp.a \
 	CC="%{__cc}" \
-	DEBUG="%{rpmcflags}"
+	DEBUG="%{rpmcflags} %{rpmcppflags}" \
+	LDFLAGS="%{rpmldflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_includedir}}
 
-install src/libftp.so.3.1 $RPM_BUILD_ROOT%{_libdir}
-ln -sf libftp.so.3.1 $RPM_BUILD_ROOT%{_libdir}/libftp.so.3
-ln -sf libftp.so.3.1 $RPM_BUILD_ROOT%{_libdir}/libftp.so
+install src/libftp.so.4.0 $RPM_BUILD_ROOT%{_libdir}
+ln -sf libftp.so.4.0 $RPM_BUILD_ROOT%{_libdir}/libftp.so.4
+ln -sf libftp.so.4.0 $RPM_BUILD_ROOT%{_libdir}/libftp.so
 install src/libftp.a $RPM_BUILD_ROOT%{_libdir}
 install src/ftplib.h $RPM_BUILD_ROOT%{_includedir}
 install src/qftp $RPM_BUILD_ROOT%{_bindir}
@@ -77,10 +89,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGES NOTES README.ftplib_v3.1 README.qftp TODO additional_rfcs
+%doc CHANGES LICENSE README.ftplib-4.0-1 README.qftp additional_rfcs
 %attr(755,root,root) %{_bindir}/qftp
 %attr(755,root,root) %{_libdir}/libftp.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/libftp.so.3
+%attr(755,root,root) %ghost %{_libdir}/libftp.so.4
 
 %files devel
 %defattr(644,root,root,755)

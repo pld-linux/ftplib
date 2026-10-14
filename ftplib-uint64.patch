@@ -1,0 +1,68 @@
+# glibc never defines __UINT64_MAX, so 64-bit sizes (fsz_t, FtpSizeLong) were never enabled
+--- a/src/ftplib.c
++++ b/src/ftplib.c
+@@ -51,8 +51,8 @@
+ #define BUILDING_LIBRARY
+ #include "ftplib.h"
+ 
+-#if defined(__UINT64_MAX) && !defined(PRIu64)
+-#if ULONG_MAX == __UINT32_MAX
++#if defined(UINT64_MAX) && !defined(PRIu64)
++#if ULONG_MAX == UINT32_MAX
+ #define PRIu64 "llu"
+ #else
+ #define PRIu64 "lu"
+@@ -1328,7 +1328,7 @@
+     return rv;
+ }
+ 
+-#if defined(__UINT64_MAX)
++#if defined(UINT64_MAX)
+ /*
+  * FtpSizeLong - determine the size of a remote file
+  *
+--- a/src/ftplib.h
++++ b/src/ftplib.h
+@@ -62,7 +62,7 @@
+ extern "C" {
+ #endif
+ 
+-#if defined(__UINT64_MAX)
++#if defined(UINT64_MAX)
+ typedef uint64_t fsz_t;
+ #else
+ typedef uint32_t fsz_t;
+@@ -101,7 +101,7 @@
+ GLOBALREF int FtpNlst(const char *output, const char *path, netbuf *nControl);
+ GLOBALREF int FtpDir(const char *output, const char *path, netbuf *nControl);
+ GLOBALREF int FtpSize(const char *path, unsigned int *size, char mode, netbuf *nControl);
+-#if defined(__UINT64_MAX)
++#if defined(UINT64_MAX)
+ GLOBALREF int FtpSizeLong(const char *path, fsz_t *size, char mode, netbuf *nControl);
+ #endif
+ GLOBALREF int FtpModDate(const char *path, char *dt, int max, netbuf *nControl);
+--- a/src/qftp.c
++++ b/src/qftp.c
+@@ -53,11 +53,11 @@
+ 
+ #define DIRBUF_SIZE 1024 /* for wildcard processing */
+ 
+-#if defined(__UINT64_MAX)
++#if defined(UINT64_MAX)
+ #if defined(PRIu64)
+ #define PRIFSZ PRIu64
+ #else
+-#if ULONG_MAX == __UINT32_MAX
++#if ULONG_MAX == UINT32_MAX
+ #define PRIFSZ "llu"
+ #else
+ #define PRIFSZ "lu"
+@@ -298,7 +298,7 @@
+ 	{
+ 	    struct REMFILE *f = filelist;
+ 	    filelist = f->next;
+-#if defined(__UINT64_MAX)
++#if defined(UINT64_MAX)
+ 	    if (!FtpSizeLong(f->fnm, &fsz, mode, conn))
+ #else
+ 	    if (!FtpSize(f->fnm, &fsz, mode, conn))

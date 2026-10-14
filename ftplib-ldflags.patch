@@ -1,0 +1,29 @@
+# upstream Makefile ignores LDFLAGS when linking libftp.so
+--- ftplib-4.0-1.orig/src/Makefile
++++ ftplib-4.0-1/src/Makefile
+@@ -15,7 +15,7 @@
+ SOURCES = qftp.c ftplib.c
+ 
+ CFLAGS = -Wall $(DEBUG) -I. $(INCLUDES) $(DEFINES) -Wno-unused-variable -D_FILE_OFFSET_BITS=64 -D__unix__
+-LDFLAGS = -L.
++LDFLAGS =
+ DEPFLAGS =
+ 
+ all : $(TARGETS)
+@@ -59,14 +59,14 @@
+ 	ar -rcs $@ $<
+ 
+ libftp.so.$(SOVERSION): ftplib.o
+-	$(CC) -shared -Wl,-soname,libftp.so.$(SONAME) -lc -o $@ $<
++	$(CC) $(LDFLAGS) -shared -Wl,-soname,libftp.so.$(SONAME) -o $@ $< -lc
+ 
+ libftp.so: libftp.so.$(SOVERSION)
+ 	ln -sf $< libftp.so.$(SONAME)
+ 	ln -sf $< $@
+ 
+ qftp : qftp.o libftp.so ftplib.h
+-	$(CC) $(LDFLAGS) -o $@ $< -lftp
++	$(CC) $(LDFLAGS) -o $@ $< -L. -lftp
+ 
+ ifeq (.depend,$(wildcard .depend))
+ include .depend
